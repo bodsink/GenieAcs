@@ -11,9 +11,6 @@ services:
     volumes:
       - ./mongo-data:/data/db
     # Pin the MongoDB container to a static address on the internal network
-    networks:
-      genie-net:
-        ipv4_address: 100.67.0.2
 
   # Build an image from the repository once and reuse it for all GenieACS services
   genieacs-build:
@@ -22,9 +19,6 @@ services:
       dockerfile: Dockerfile
     image: genieacs-base
     command: ["sleep", "infinity"]
-    networks:
-      genie-net:
-        ipv4_address: 100.67.0.3
 
   # GenieACS UI service listening on all interfaces with a fixed IP
   ui:
@@ -40,9 +34,6 @@ services:
       GENIEACS_UI_INTERFACE: 0.0.0.0
     depends_on:
       - mongodb
-    networks:
-      genie-net:
-        ipv4_address: 100.67.0.4
 
   # GenieACS CWMP service (ACS server) with extensions directory mounted
   cwmp:
@@ -60,9 +51,6 @@ services:
       - ./ext:/opt/genieacs/ext
     depends_on:
       - mongodb
-    networks:
-      genie-net:
-        ipv4_address: 100.67.0.6
 
   # GenieACS NBI service for API access
   nbi:
@@ -76,9 +64,6 @@ services:
       GENIEACS_NBI_INTERFACE: 0.0.0.0
     depends_on:
       - mongodb
-    networks:
-      genie-net:
-        ipv4_address: 172.25.0.12
 
   # GenieACS File Server service
   fs:
@@ -92,9 +77,6 @@ services:
       GENIEACS_FS_INTERFACE: 0.0.0.0
     depends_on:
       - mongodb
-    networks:
-      genie-net:
-        ipv4_address: 100.67.0.7
 
   # WireGuard VPN server with web UI (wg-easy) to allow CPEs to connect and route traffic to GenieACS
   wg-easy:
@@ -122,14 +104,7 @@ services:
     sysctls:
       - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
-    networks:
-      genie-net:
-        ipv4_address: 100.67.0.8
 
 networks:
   genie-net:
     driver: bridge
-    ipam:
-      config:
-        - subnet: 100.67.0.0/24
-          gateway: 100.67.0.1
