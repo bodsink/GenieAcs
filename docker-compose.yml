@@ -7,7 +7,7 @@ services:
     volumes:
       - ./:/app
     ports:
-      - "3000"
+      - "3000:3000"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
       - GENIEACS_DEBUG_FILE=/app/genieacs-debug.yaml
@@ -26,7 +26,7 @@ services:
       - ./:/app
       - ./ext:/opt/genieacs/ext
     ports:
-      - "7547"
+      - "7547:7547"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
       - GENIEACS_DEBUG_FILE=/app/genieacs-debug.yaml
@@ -46,7 +46,7 @@ services:
     volumes:
       - ./:/app
     ports:
-      - "7557"
+      - "7557:7557"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
       - GENIEACS_NBI_INTERFACE=0.0.0.0
@@ -63,7 +63,7 @@ services:
     volumes:
       - ./:/app
     ports:
-      - "7567"
+      - "7567:7567"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
     networks:

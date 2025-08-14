@@ -28,7 +28,7 @@ services:
     working_dir: /app
     command: sh -c "npm install && node bin/genieacs-ui"
     ports:
-      - "3000:3000"
+      - "3000"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
       - GENIEACS_DEBUG_FILE=/app/genieacs-debug.yaml
@@ -42,7 +42,7 @@ services:
     working_dir: /app
     command: sh -c "npm install && node bin/genieacs-cwmp"
     ports:
-      - "7547:7547"
+      - "7547"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
       - GENIEACS_DEBUG_FILE=/app/genieacs-debug.yaml
@@ -59,7 +59,7 @@ services:
     working_dir: /app
     command: sh -c "npm install && node bin/genieacs-nbi"
     ports:
-      - "7557:7557"
+      - "7557"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
       - GENIEACS_NBI_INTERFACE=0.0.0.0
@@ -72,7 +72,7 @@ services:
     working_dir: /app
     command: sh -c "npm install && node bin/genieacs-fs"
     ports:
-      - "7567:7567"
+      - "7567"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
     depends_on:
