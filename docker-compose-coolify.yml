@@ -105,7 +105,7 @@ services:
       - SYS_MODULE
     environment:
       # Ganti dengan domain publik atau IP server untuk akses VPN
-      WG_HOST: vpn1.dev.kejora.net
+      WG_HOST: vpn.example.com
       # Kata sandi untuk antarmuka web wg-easy
       PASSWORD: change-me
       # Subnet untuk klien WireGuard
