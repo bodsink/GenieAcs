@@ -6,28 +6,30 @@ x-env: &env
 
 services:
   mongodb:
-    image: mongo:6.0
+    image: mongo:6.0-jammy
     container_name: mongodb
     restart: unless-stopped
+    command: ["mongod", "--auth", "--bind_ip_all"]
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
       - "27017:27017"
+    # Pakai named volume agar aman di Coolify (izin/SELinux/rofs)
     volumes:
-      - ./mongo-data:/data/db
+      - mongo_data:/data/db
     networks: [app-network]
     healthcheck:
-      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping')"]
+      test: ["CMD-SHELL", "echo 'db.runCommand({ ping: 1 })' | mongosh --quiet --username \"$MONGO_INITDB_ROOT_USERNAME\" --password \"$MONGO_INITDB_ROOT_PASSWORD\" --authenticationDatabase admin localhost:27017/admin || exit 1"]
       interval: 10s
       timeout: 5s
-      retries: 20
+      retries: 30
+      start_period: 20s
 
   ui:
     image: node:lts
     container_name: genieacs-ui
     working_dir: /app
-    # install sekali (disimpan di volume), lalu jalan
     command: sh -lc "test -d node_modules || npm ci --omit=dev --no-audit --no-fund; node bin/genieacs-ui"
     environment:
       <<: *env
@@ -107,6 +109,7 @@ networks:
     driver: bridge
 
 volumes:
+  mongo_data:
   ui_node_modules:
   cwmp_node_modules:
   nbi_node_modules:
