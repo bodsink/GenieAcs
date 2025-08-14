@@ -1,21 +1,17 @@
-version: "3.8"
-
 services:
   ui:
     image: node:lts
     container_name: genieacs-ui
     working_dir: /app
-    command: sh -lc "([ -d node_modules ] || npm ci --omit=dev --no-audit --no-fund) && npm run -s build && node dist/bin/genieacs-ui"
+    command: sh -c "npm install && node bin/genieacs-ui"
     volumes:
       - ./:/app
-      - ui_node_modules:/app/node_modules
     ports:
       - "3000:3000"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
       - GENIEACS_DEBUG_FILE=/app/genieacs-debug.yaml
       - GENIEACS_UI_JWT_SECRET=change-this-secret
-      - NODE_ENV=production
     networks:
       - app-network
     depends_on:
@@ -25,11 +21,10 @@ services:
     image: node:lts
     container_name: genieacs-cwmp
     working_dir: /app
-    command: sh -lc "([ -d node_modules ] || npm ci --omit=dev --no-audit --no-fund) && npm run -s build && node dist/bin/genieacs-cwmp"
+    command: sh -c "npm install && node bin/genieacs-cwmp"
     volumes:
       - ./:/app
-      - ./ext:/opt/genieacs/ext:ro
-      - cwmp_node_modules:/app/node_modules
+      - ./ext:/opt/genieacs/ext
     ports:
       - "7547:7547"
     environment:
@@ -37,26 +32,24 @@ services:
       - GENIEACS_DEBUG_FILE=/app/genieacs-debug.yaml
       - GENIEACS_EXT_DIR=/opt/genieacs/ext
       - GENIEACS_CWMP_INTERFACE=0.0.0.0
-      - NODE_ENV=production
     networks:
       - app-network
     depends_on:
       - mongodb
 
+
   nbi:
     image: node:lts
     container_name: genieacs-nbi
     working_dir: /app
-    command: sh -lc "([ -d node_modules ] || npm ci --omit=dev --no-audit --no-fund) && npm run -s build && node dist/bin/genieacs-nbi"
+    command: sh -c "npm install && node bin/genieacs-nbi"
     volumes:
       - ./:/app
-      - nbi_node_modules:/app/node_modules
     ports:
       - "7557:7557"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
       - GENIEACS_NBI_INTERFACE=0.0.0.0
-      - NODE_ENV=production
     networks:
       - app-network
     depends_on:
@@ -66,15 +59,13 @@ services:
     image: node:lts
     container_name: genieacs-fs
     working_dir: /app
-    command: sh -lc "([ -d node_modules ] || npm ci --omit=dev --no-audit --no-fund) && npm run -s build && node dist/bin/genieacs-fs"
+    command: sh -c "npm install && node bin/genieacs-fs"
     volumes:
       - ./:/app
-      - fs_node_modules:/app/node_modules
     ports:
       - "7567:7567"
     environment:
       - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
-      - NODE_ENV=production
     networks:
       - app-network
     depends_on:
@@ -97,9 +88,3 @@ services:
 networks:
   app-network:
     driver: bridge
-
-volumes:
-  ui_node_modules:
-  cwmp_node_modules:
-  nbi_node_modules:
-  fs_node_modules:
