@@ -79,32 +79,23 @@ services:
       - mongodb
 
   # WireGuard VPN server with web UI (wg-easy) to allow CPEs to connect and route traffic to GenieACS
-  wg-easy:
-    image: ghcr.io/wg-easy/wg-easy
-    container_name: wg-easy
+   wg-easy:
+    image: 'ghcr.io/wg-easy/wg-easy:latest'
+    environment:
+      - SERVICE_FQDN_WIREGUARDEASY_8000
+      - 'WG_HOST=${SERVICE_FQDN_WIREGUARDEASY}'
+      - 'LANG=${LANG:-en}'
+      - WG_PORT=51820
+    volumes:
+      - 'wg-easy:/etc/wireguard'
+    ports:
+      - '51820:51820/udp'
     cap_add:
       - NET_ADMIN
       - SYS_MODULE
-    environment:
-      # Ganti dengan domain publik atau IP server untuk akses VPN
-      WG_HOST: vpn1.dev.kejora.net
-      # Kata sandi untuk antarmuka web wg-easy
-      #PASSWORD: change-me
-      # Subnet untuk klien WireGuard
-      WG_DEFAULT_ADDRESS: 10.8.0.0
-      # DNS yang diberikan ke klien
-      WG_DEFAULT_DNS: 8.8.8.8
-      # Subnet internal Docker dimana GenieACS berada sehingga klien VPN bisa merutekannya
-      WG_ALLOWED_IPS: 172.25.0.0/24
-    volumes:
-      - ./wg-easy-config:/etc/wireguard
-    ports:
-      - "51820/udp" # port WireGuard
-      - "51821/tcp" # UI wg-easy
     sysctls:
-      - net.ipv4.ip_forward=1
       - net.ipv4.conf.all.src_valid_mark=1
-
+      - net.ipv4.ip_forward=1
 networks:
   genie-net:
     driver: bridge
