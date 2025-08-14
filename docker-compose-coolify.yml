@@ -78,8 +78,6 @@ services:
     depends_on:
       - mongodb
 
-  # WireGuard VPN server with web UI (wg-easy) to allow CPEs to connect and route traffic to GenieACS
-  wg-easy:
     image: ghcr.io/wg-easy/wg-easy
     container_name: wg-easy
     cap_add:
