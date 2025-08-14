@@ -91,11 +91,11 @@ services:
       # Kata sandi untuk antarmuka web wg-easy
       #PASSWORD: change-me
       # Subnet untuk klien WireGuard
-      WG_DEFAULT_ADDRESS: 10.8.0.0/24
+      #WG_DEFAULT_ADDRESS: 10.8.0.0/24
       # DNS yang diberikan ke klien
       WG_DEFAULT_DNS: 8.8.8.8
       # Subnet internal Docker dimana GenieACS berada sehingga klien VPN bisa merutekannya
-      WG_ALLOWED_IPS: 172.25.0.0/24
+      #WG_ALLOWED_IPS: 172.25.0.0/24
     volumes:
       - ./wg-easy-config:/etc/wireguard
     ports:
