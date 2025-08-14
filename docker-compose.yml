@@ -1,115 +1,104 @@
 version: "3.8"
 
-x-env: &env
-  NODE_ENV: production
-  GENIEACS_MONGODB_CONNECTION_URL: mongodb://root:password@mongodb:27017/genieacs?authSource=admin
-
 services:
-  mongodb:
-    image: mongo:latest
-    container_name: mongodb
-    restart: unless-stopped
-    command: ["mongod", "--auth", "--bind_ip_all"]
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: password
-    ports:
-      - "27017:27017"
-    # Pakai named volume agar aman di Coolify (izin/SELinux/rofs)
-    volumes:
-      - mongo_data:/data/db
-    networks: [app-network]
-    healthcheck:
-      test: ["CMD-SHELL", "echo 'db.runCommand({ ping: 1 })' | mongosh --quiet --username \"$MONGO_INITDB_ROOT_USERNAME\" --password \"$MONGO_INITDB_ROOT_PASSWORD\" --authenticationDatabase admin localhost:27017/admin || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 30
-      start_period: 20s
-
   ui:
     image: node:lts
     container_name: genieacs-ui
     working_dir: /app
-    command: sh -lc "test -d node_modules || npm ci --omit=dev --no-audit --no-fund; node bin/genieacs-ui"
-    environment:
-      <<: *env
-      GENIEACS_UI_JWT_SECRET: change-this-secret
-      GENIEACS_DEBUG_FILE: /app/genieacs-debug.yaml
-    ports:
-      - "3000:3000"
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    restart: unless-stopped
-    networks: [app-network]
+    command: sh -lc "([ -d node_modules ] || npm ci --omit=dev --no-audit --no-fund) && npm run -s build && node dist/bin/genieacs-ui"
     volumes:
       - ./:/app
       - ui_node_modules:/app/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
+      - GENIEACS_DEBUG_FILE=/app/genieacs-debug.yaml
+      - GENIEACS_UI_JWT_SECRET=change-this-secret
+      - NODE_ENV=production
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
 
   cwmp:
     image: node:lts
     container_name: genieacs-cwmp
     working_dir: /app
-    command: sh -lc "test -d node_modules || npm ci --omit=dev --no-audit --no-fund; node bin/genieacs-cwmp"
-    environment:
-      <<: *env
-      GENIEACS_CWMP_INTERFACE: 0.0.0.0
-      GENIEACS_DEBUG_FILE: /app/genieacs-debug.yaml
-      GENIEACS_EXT_DIR: /app/ext
-    ports:
-      - "7547:7547"
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    restart: unless-stopped
-    networks: [app-network]
+    command: sh -lc "([ -d node_modules ] || npm ci --omit=dev --no-audit --no-fund) && npm run -s build && node dist/bin/genieacs-cwmp"
     volumes:
       - ./:/app
-      - ./ext:/app/ext:ro
+      - ./ext:/opt/genieacs/ext:ro
       - cwmp_node_modules:/app/node_modules
+    ports:
+      - "7547:7547"
+    environment:
+      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
+      - GENIEACS_DEBUG_FILE=/app/genieacs-debug.yaml
+      - GENIEACS_EXT_DIR=/opt/genieacs/ext
+      - GENIEACS_CWMP_INTERFACE=0.0.0.0
+      - NODE_ENV=production
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
 
   nbi:
     image: node:lts
     container_name: genieacs-nbi
     working_dir: /app
-    command: sh -lc "test -d node_modules || npm ci --omit=dev --no-audit --no-fund; node bin/genieacs-nbi"
-    environment:
-      <<: *env
-      GENIEACS_NBI_INTERFACE: 0.0.0.0
-    ports:
-      - "7557:7557"
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    restart: unless-stopped
-    networks: [app-network]
+    command: sh -lc "([ -d node_modules ] || npm ci --omit=dev --no-audit --no-fund) && npm run -s build && node dist/bin/genieacs-nbi"
     volumes:
       - ./:/app
       - nbi_node_modules:/app/node_modules
+    ports:
+      - "7557:7557"
+    environment:
+      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
+      - GENIEACS_NBI_INTERFACE=0.0.0.0
+      - NODE_ENV=production
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
 
   fs:
     image: node:lts
     container_name: genieacs-fs
     working_dir: /app
-    command: sh -lc "test -d node_modules || npm ci --omit=dev --no-audit --no-fund; node bin/genieacs-fs"
-    environment: *env
-    ports:
-      - "7567:7567"
-    depends_on:
-      mongodb:
-        condition: service_healthy
-    restart: unless-stopped
-    networks: [app-network]
+    command: sh -lc "([ -d node_modules ] || npm ci --omit=dev --no-audit --no-fund) && npm run -s build && node dist/bin/genieacs-fs"
     volumes:
       - ./:/app
       - fs_node_modules:/app/node_modules
+    ports:
+      - "7567:7567"
+    environment:
+      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
+      - NODE_ENV=production
+    networks:
+      - app-network
+    depends_on:
+      - mongodb
+
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./mongo-data:/data/db
+    networks:
+      - app-network
 
 networks:
   app-network:
     driver: bridge
 
 volumes:
-  mongo_data:
   ui_node_modules:
   cwmp_node_modules:
   nbi_node_modules:
