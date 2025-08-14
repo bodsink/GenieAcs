@@ -2,10 +2,8 @@ services:
   ui:
     image: node:lts
     container_name: genieacs-ui
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: sh -c "node bin/genieacs-ui"
+    working_dir: /app
+    command: sh -c "npm install && node bin/genieacs-ui"
     volumes:
       - ./:/app
     ports:
@@ -22,10 +20,8 @@ services:
   cwmp:
     image: node:lts
     container_name: genieacs-cwmp
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: sh -c "node bin/genieacs-cwmp"
+    working_dir: /app
+    command: sh -c "npm install && node bin/genieacs-cwmp"
     volumes:
       - ./:/app
       - ./ext:/opt/genieacs/ext
@@ -41,13 +37,12 @@ services:
     depends_on:
       - mongodb
 
+
   nbi:
     image: node:lts
     container_name: genieacs-nbi
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: sh -c "node bin/genieacs-nbi"
+    working_dir: /app
+    command: sh -c "npm install && node bin/genieacs-nbi"
     volumes:
       - ./:/app
     ports:
@@ -61,12 +56,10 @@ services:
       - mongodb
 
   fs:
-    image: node:lts 
+    image: node:lts
     container_name: genieacs-fs
-    build:
-      context: .
-      dockerfile: Dockerfile
-    command: sh -c "node bin/genieacs-fs"
+    working_dir: /app
+    command: sh -c "npm install && node bin/genieacs-fs"
     volumes:
       - ./:/app
     ports:
