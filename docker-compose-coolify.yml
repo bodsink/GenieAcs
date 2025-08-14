@@ -87,9 +87,6 @@ services:
       - SYS_MODULE
     environment:
       # Ganti dengan domain publik atau IP server untuk akses VPN
-      WG_HOST: vpn.example.com
-      # Kata sandi untuk antarmuka web wg-easy
-      PASSWORD: change-me
       # Subnet untuk klien WireGuard
       WG_DEFAULT_ADDRESS: 10.8.0.0/24
       # DNS yang diberikan ke klien
