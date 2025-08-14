@@ -3,7 +3,7 @@ services:
     image: node:lts
     container_name: genieacs-ui
     working_dir: /app
-    command: sh -c "node bin/genieacs-ui"
+    command: sh -c "npm install && node bin/genieacs-ui"
     volumes:
       - ./:/app
     ports:
@@ -21,7 +21,7 @@ services:
     image: node:lts
     container_name: genieacs-cwmp
     working_dir: /app
-    command: sh -c "node bin/genieacs-cwmp"
+    command: sh -c "npm install && node bin/genieacs-cwmp"
     volumes:
       - ./:/app
       - ./ext:/opt/genieacs/ext
@@ -42,7 +42,7 @@ services:
     image: node:lts
     container_name: genieacs-nbi
     working_dir: /app
-    command: sh -c "node bin/genieacs-nbi"
+    command: sh -c "npm install && node bin/genieacs-nbi"
     volumes:
       - ./:/app
     ports:
@@ -59,7 +59,7 @@ services:
     image: node:lts
     container_name: genieacs-fs
     working_dir: /app
-    command: sh -c "node bin/genieacs-fs"
+    command: sh -c "npm install && node bin/genieacs-fs"
     volumes:
       - ./:/app
     ports:
