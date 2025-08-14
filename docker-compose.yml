@@ -6,7 +6,7 @@ x-env: &env
 
 services:
   mongodb:
-    image: mongo:6.0-jammy
+    image: mongo:latest
     container_name: mongodb
     restart: unless-stopped
     command: ["mongod", "--auth", "--bind_ip_all"]
