@@ -82,7 +82,7 @@ services:
    wg-easy:
     image: 'ghcr.io/wg-easy/wg-easy:latest'
     environment:
-      - 'WG_HOST=${SERVICE_FQDN_WIREGUARDEASY}'
+      - 'WG_HOST=${wg-easy}'
       - 'LANG=${LANG:-en}'
       - WG_PORT=51820
     volumes:
