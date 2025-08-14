@@ -13,7 +13,7 @@ services:
     # Pin the MongoDB container to a static address on the internal network
     networks:
       genie-net:
-        ipv4_address: 172.25.0.2
+        ipv4_address: 100.67.0.2
 
   # Build an image from the repository once and reuse it for all GenieACS services
   genieacs-build:
@@ -24,7 +24,7 @@ services:
     command: ["sleep", "infinity"]
     networks:
       genie-net:
-        ipv4_address: 172.25.0.3
+        ipv4_address: 100.67.0.3
 
   # GenieACS UI service listening on all interfaces with a fixed IP
   ui:
@@ -42,7 +42,7 @@ services:
       - mongodb
     networks:
       genie-net:
-        ipv4_address: 172.25.0.10
+        ipv4_address: 100.67.0.4
 
   # GenieACS CWMP service (ACS server) with extensions directory mounted
   cwmp:
@@ -55,14 +55,14 @@ services:
       GENIEACS_MONGODB_CONNECTION_URL: mongodb://root:password@mongodb:27017/genieacs?authSource=admin
       GENIEACS_DEBUG_FILE: /app/genieacs-debug.yaml
       GENIEACS_EXT_DIR: /opt/genieacs/ext
-      GENIEACS_CWMP_INTERFACE: 0.0.0.0
+      GENIEACS_CWMP_INTERFACE: 100.67.0.5
     volumes:
       - ./ext:/opt/genieacs/ext
     depends_on:
       - mongodb
     networks:
       genie-net:
-        ipv4_address: 172.25.0.11
+        ipv4_address: 100.67.0.6
 
   # GenieACS NBI service for API access
   nbi:
@@ -94,7 +94,7 @@ services:
       - mongodb
     networks:
       genie-net:
-        ipv4_address: 172.25.0.13
+        ipv4_address: 100.67.0.7
 
   # WireGuard VPN server with web UI (wg-easy) to allow CPEs to connect and route traffic to GenieACS
   wg-easy:
@@ -124,12 +124,12 @@ services:
       - net.ipv4.conf.all.src_valid_mark=1
     networks:
       genie-net:
-        ipv4_address: 172.25.0.20
+        ipv4_address: 100.67.0.8
 
 networks:
   genie-net:
     driver: bridge
     ipam:
       config:
-        - subnet: 172.25.0.0/24
-          gateway: 172.25.0.1
+        - subnet: 100.67.0.0/24
+          gateway: 100.67.0.1
