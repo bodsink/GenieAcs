@@ -5,7 +5,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: sh -c "npm install && node bin/genieacs-ui"
+    command: sh -c "node bin/genieacs-ui"
     volumes:
       - ./:/app
     ports:
@@ -25,7 +25,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: sh -c "npm install && node bin/genieacs-cwmp"
+    command: sh -c "node bin/genieacs-cwmp"
     volumes:
       - ./:/app
       - ./ext:/opt/genieacs/ext
@@ -47,7 +47,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: sh -c "npm install && node bin/genieacs-nbi"
+    command: sh -c "node bin/genieacs-nbi"
     volumes:
       - ./:/app
     ports:
@@ -66,7 +66,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    command: sh -c "npm install && node bin/genieacs-fs"
+    command: sh -c "node bin/genieacs-fs"
     volumes:
       - ./:/app
     ports:
