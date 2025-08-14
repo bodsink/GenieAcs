@@ -2,52 +2,47 @@ version: '3.8'
 services:
   mongodb:
     image: mongo:latest
-    container_name: mongodb
-    restart: unless-stopped
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: password
     ports:
-      - "27017:27017"
+      - "27017"
     volumes:
       - ./mongo-data:/data/db
 
   # Build a single image from this repository and reuse it for all GenieACS services
-  genieacs-base:
+  genieacs-build:
     build:
       context: .
       dockerfile: Dockerfile
     image: genieacs-base
-    # set working directory so process.cwd() resolves to the project root
-    working_dir: /app
     command: ["sleep", "infinity"]
 
   ui:
     image: genieacs-base
-    container_name: genieacs-ui
     working_dir: /app
     command: sh -c "npm install && node bin/genieacs-ui"
     ports:
       - "3000"
     environment:
-      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
-      - GENIEACS_DEBUG_FILE=/app/genieacs-debug.yaml
-      - GENIEACS_UI_JWT_SECRET=change-this-secret
+      GENIEACS_MONGODB_CONNECTION_URL: mongodb://root:password@mongodb:27017/genieacs?authSource=admin
+      GENIEACS_DEBUG_FILE: /app/genieacs-debug.yaml
+      GENIEACS_UI_JWT_SECRET: change-this-secret
+      GENIEACS_UI_INTERFACE: 0.0.0.0
     depends_on:
       - mongodb
 
   cwmp:
     image: genieacs-base
-    container_name: genieacs-cwmp
     working_dir: /app
     command: sh -c "npm install && node bin/genieacs-cwmp"
     ports:
       - "7547"
     environment:
-      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
-      - GENIEACS_DEBUG_FILE=/app/genieacs-debug.yaml
-      - GENIEACS_EXT_DIR=/opt/genieacs/ext
-      - GENIEACS_CWMP_INTERFACE=0.0.0.0
+      GENIEACS_MONGODB_CONNECTION_URL: mongodb://root:password@mongodb:27017/genieacs?authSource=admin
+      GENIEACS_DEBUG_FILE: /app/genieacs-debug.yaml
+      GENIEACS_EXT_DIR: /opt/genieacs/ext
+      GENIEACS_CWMP_INTERFACE: 0.0.0.0
     volumes:
       - ./ext:/opt/genieacs/ext
     depends_on:
@@ -55,28 +50,56 @@ services:
 
   nbi:
     image: genieacs-base
-    container_name: genieacs-nbi
     working_dir: /app
     command: sh -c "npm install && node bin/genieacs-nbi"
     ports:
       - "7557"
     environment:
-      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
-      - GENIEACS_NBI_INTERFACE=0.0.0.0
+      GENIEACS_MONGODB_CONNECTION_URL: mongodb://root:password@mongodb:27017/genieacs?authSource=admin
+      GENIEACS_NBI_INTERFACE: 0.0.0.0
     depends_on:
       - mongodb
 
   fs:
     image: genieacs-base
-    container_name: genieacs-fs
     working_dir: /app
     command: sh -c "npm install && node bin/genieacs-fs"
     ports:
       - "7567"
     environment:
-      - GENIEACS_MONGODB_CONNECTION_URL=mongodb://root:password@mongodb:27017/genieacs?authSource=admin
+      GENIEACS_MONGODB_CONNECTION_URL: mongodb://root:password@mongodb:27017/genieacs?authSource=admin
+      GENIEACS_FS_INTERFACE: 0.0.0.0
     depends_on:
       - mongodb
+
+  # VPN server using wg-easy to provide WireGuard + Web UI
+  wg-easy:
+    image: ghcr.io/wg-easy/wg-easy
+    container_name: wg-easy
+    cap_add:
+      - NET_ADMIN
+      - SYS_MODULE
+    environment:
+      # Replace with your public domain or IP address for the VPN server
+      WG_HOST: vpn.example.com
+      # Set a secure password for the web UI
+      PASSWORD: change-me
+      # Subnet used for WireGuard clients
+      WG_DEFAULT_ADDRESS: 10.8.0.0/24
+      # DNS server handed out to clients
+      WG_DEFAULT_DNS: 8.8.8.8
+      # Allow clients to access the Docker network where GenieACS is running
+      WG_ALLOWED_IPS: 172.20.0.0/16
+    volumes:
+      - ./wg-easy-config:/etc/wireguard
+    ports:
+      - "51820/udp"
+      - "1821/tcp"
+    sysctls:
+      - net.ipv4.ip_forward=1
+      - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      - default
 
 networks:
   default:
